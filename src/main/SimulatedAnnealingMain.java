@@ -194,7 +194,7 @@ public class SimulatedAnnealingMain {
 
             // Keep track of the best solution found
             
-            // Update T (every L iterations, ie L=50)
+            // Update T (every L iterations, i.e. L=50)
         	// T = alfa*T (alfa=0.9)
 		
 	}// end of main
