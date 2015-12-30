@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
+
+import util.DistributionGenerator;
 /**
  * Clase que la seleccion que permite que todos los nodos sean cubiertos por el minimo numero de estaciones de incendio.
  * @author javier
@@ -76,6 +78,36 @@ public class BruteApproach {
 		listaEstaciones.add(estacion16);
 	}
 	
+	// Calcula la probabilidad de aceptacion
+    public static double probabilidadAceptacion(int numEstSolActual, int numEstNuevaActual, double temperatura) {
+        // Si la nueva solución es mejor, la aceptamos
+        if (numEstNuevaActual < numEstSolActual) {
+            return 1.0;
+        }
+        // Si la nueva solucion es peor, calculamos la probabilidad de aceptacion
+        return Math.exp(-(numEstNuevaActual - numEstSolActual) / temperatura);
+    }
+	
+	/**
+	 * Metodo que genera una posible solucion inicial, la cual es una lista de estaciones.
+	 * @param numeroEstaciones
+	 * @return
+	 */
+	public static ArrayList<Integer> generateInitialSolution(){
+		//Numero de estaciones con las que cubriremos el problema [1,16]
+		int numeroDeEstacion = new Random().nextInt(15) + 1;
+		
+		int[] estaciones = new Random().ints(0,15).distinct().limit(numeroDeEstacion).toArray();
+		ArrayList<Integer> posibleSolucion = new ArrayList<>();
+
+	    for (int index = 0; index < estaciones.length; index++)
+	    {
+	    	posibleSolucion.add(estaciones[index]);
+	    }
+	    
+		return posibleSolucion; 
+	}
+	
 	/**
 	 * Metodo que genera una posible solucion, la cual es una lista de estaciones.
 	 * @param numeroEstaciones
@@ -97,27 +129,70 @@ public class BruteApproach {
 	 * Opcion bruta de alcanzar el maximo
 	 */
 	public static void bruteApproach(){
-		ArrayList<Integer> posibleSolucion = null;
+		ArrayList<Integer> posibleSolucionY = null;
 		HashSet<Integer> nodosCubiertos = null;
-		int numeroDePruebas = 1000000;
+		
+		//TODO hay que calcular T tal y como lo explicó Antonio en clase,
+		//es decir, tal que la probabilidad inicial de aceptación de soluciones peores sea por ej 0.9
+        double temperatura = 10000; // para las pruebas iniciales vale este valor
+        
+        // 2 - Escogemos una solución inicial x, 
+        // perteneciente al conjunto de soluciones
+        ArrayList<Integer> posibleSolXi = generateInitialSolution();
+        
+        // 3 - La configuramos como la mejor solución hasta el momento
+        
+        // xi --> solucion actual
+ 		// y  --> nueva solucion
+ 		// pi --> probabilidad de aceptacion
+ 		// u  --> valor de la uniforme
+ 		int numEstacionesXi = 0;
+ 		int numEstacionesY = 0;
+ 		double pi = 1.0;
+ 		double u = 0.0;
+				
+ 		int numeroDePruebas = 1000000;
+ 		
+ 		//TODO cambiar for por while(!hemosConvergido)
 		for(int i = 0 ; i < numeroDePruebas; i++){
 			nodosCubiertos = new HashSet<>();
 
 			//Numero de estaciones con las que cubriremos el problema
 			int numeroDeEstacion = new Random().nextInt(15) + 1;
 			
-			posibleSolucion = generateSolution(numeroDeEstacion);
+			
+			// Create new solution y
+			posibleSolucionY = generateSolution(numeroDeEstacion);
 			
 			//Para cada nodo cogemos sus conexiones
-			for (int j = 0 ; j < posibleSolucion.size(); j++)
+			for (int j = 0 ; j < posibleSolucionY.size(); j++)
 			{
-				for(int num : listaEstaciones.get(posibleSolucion.get(j))){
+				for(int num : listaEstaciones.get(posibleSolucionY.get(j))){
 					nodosCubiertos.add(num);
 				}
 			}
-			Collections.sort(posibleSolucion);
+			Collections.sort(posibleSolucionY);
 			//Posible solucion contiene las estaciones.
-			resultadosFinales.put(new Solution(numeroDeEstacion, nodosCubiertos.toString(),posibleSolucion), nodosCubiertos.size());
+			resultadosFinales.put(new Solution(numeroDeEstacion, nodosCubiertos.toString(),posibleSolucionY), nodosCubiertos.size());
+            
+            // check if y best than x
+			// xi --> solucion actual
+     		// y  --> nueva solucion
+     		// pi --> probabilidad de aceptacion
+     		// u  --> valor de la uniforme
+     		numEstacionesXi = 3;
+     		numEstacionesY = 5;
+     		pi = probabilidadAceptacion(numEstacionesXi, numEstacionesY, temperatura);
+     		
+     		u = DistributionGenerator.uniform();
+     		
+     		// si pi > u --> hacemos sol_actual = y
+			
+     		
+            // TODO Keep track of the best solution found
+        	            
+            // TODO Update T (every L iterations, i.e. L=50)
+        	// T = alfa*T (alfa=0.9)		
 		}
 		int numeroEstacionesMinimo = 16;
 
