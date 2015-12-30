@@ -99,7 +99,8 @@ public class BruteApproach {
 	public static void bruteApproach(){
 		ArrayList<Integer> posibleSolucion = null;
 		HashSet<Integer> nodosCubiertos = null;
-		for(int i = 0 ; i < 1000000; i++){
+		int numeroDePruebas = 1000000;
+		for(int i = 0 ; i < numeroDePruebas; i++){
 			nodosCubiertos = new HashSet<>();
 
 			//Numero de estaciones con las que cubriremos el problema
@@ -118,22 +119,26 @@ public class BruteApproach {
 			//Posible solucion contiene las estaciones.
 			resultadosFinales.put(new Solution(numeroDeEstacion, nodosCubiertos.toString(),posibleSolucion), nodosCubiertos.size());
 		}
-		Map.Entry<Solution, Integer> maxEntry = null;
+		int numeroEstacionesMinimo = 16;
 
 		for (Map.Entry<Solution, Integer> entry : resultadosFinales.entrySet())
 		{
 			//Miramos si se consigue alcanzar el máximo global.
 			if( entry.getValue() == 16){
-				System.out.println(entry.getKey().getTamano());
-//				System.out.println("---------\nOPTIMA: Tamaño de solucion:" + entry.getKey().getTamano() + "\nNodos con estacion: "+entry.getKey().getNodosConEstacion() + "\nNodos cubiertos: "+entry.getKey().getNodosCubiertos());
-				if (maxEntry == null || entry.getKey().getTamano() < maxEntry.getKey().getTamano())
+				//Syso para revisar el numero de estaciones que tiene la solucion valida que acaba de ser insertada
+				//System.out.println(entry.getKey().getTamano());
+				if (entry.getKey().getTamano() < numeroEstacionesMinimo)
 			    {
-			        maxEntry = entry;
+					numeroEstacionesMinimo = entry.getKey().getTamano();
 			    }
-			}else{
-//				System.out.println("---------\nINVALIDA: Tamaño de solucion:" + entry.getKey().getTamano() + "\nNodos con estacion: "+entry.getKey().getNodosConEstacion() + "\nNodos cubiertos: "+entry.getKey().getNodosCubiertos());
 			}
 		}
-		System.out.println("Tamaño de solucion: " + maxEntry.getKey().getTamano() + "\nNodos con estacion: "+maxEntry.getKey().getNodosConEstacion() + "\nNodos cubiertos: "+maxEntry.getKey().getNodosCubiertos());
+		//Obtenemos todas las posibles soluciones con el minimo numero de estaciones ( variable numeroEstacionesMinimo)
+		for (Map.Entry<Solution, Integer> entry : resultadosFinales.entrySet())
+		{
+			if(entry.getKey().getTamano() == numeroEstacionesMinimo && entry.getValue() == 16){
+				System.out.println("----------------------------\nTamaño de solucion: " + entry.getKey().getTamano() + "\nNodos con estacion: "+entry.getKey().getNodosConEstacion() + "\nNodos cubiertos: "+entry.getKey().getNodosCubiertos());
+			}
+		}
 	}
 }
