@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
-
+/**
+ * Clase que la seleccion que permite que todos los nodos sean cubiertos por el minimo numero de estaciones de incendio.
+ * @author javier
+ *
+ */
 public class BruteApproach {
 	static //Mapa que contiene los resultados para cada ejecución con el nº de estaciones conectadas
-	HashMap<String, Integer> resultadosFinales = new HashMap<>();
+	HashMap<Solution, Integer> resultadosFinales = new HashMap<>();
 			
 	static //Arraylist con todas las estaciones
 	ArrayList<int[]> listaEstaciones = new ArrayList<>();
@@ -71,48 +76,65 @@ public class BruteApproach {
 		listaEstaciones.add(estacion16);
 	}
 	
+	public static void simulatedAnnealing(){
+		//Seleccionamos tres estaciones diferentes
+		int estacionSeleccionadaN1 = new Random().nextInt(15);
+		int estacionSeleccionadaN2 = new Random().nextInt(15);
+		int estacionSeleccionadaN3 = new Random().nextInt(15);
+		while(estacionSeleccionadaN2 == estacionSeleccionadaN1){
+			estacionSeleccionadaN2 = new Random().nextInt(15);
+		}
+		while(estacionSeleccionadaN3 == estacionSeleccionadaN1 || estacionSeleccionadaN3 == estacionSeleccionadaN2){
+			estacionSeleccionadaN3 = new Random().nextInt(15);
+		}
+	}
 	/**
 	 * Opcion bruta de alcanzar el maximo
 	 */
 	public static void bruteApproach(){
+		Map<Integer, Integer> posibleSolucion = null;
+		LinkedHashMap<Integer, Integer> nodosCubiertos = null;
+		
 		for(int i = 0 ; i < 10000000; i++){
-			//Seleccionamos tres estaciones diferentes
-			int estacionSeleccionadaN1 = new Random().nextInt(15);
-			int estacionSeleccionadaN2 = new Random().nextInt(15);
-			int estacionSeleccionadaN3 = new Random().nextInt(15);
-			while(estacionSeleccionadaN2 == estacionSeleccionadaN1){
-				estacionSeleccionadaN2 = new Random().nextInt(15);
+			nodosCubiertos = new LinkedHashMap<>();
+			posibleSolucion = new HashMap<>();
+			
+			//Numero de estaciones con las que cubriremos el problema
+			int numeroDeEstacion = new Random().nextInt(15) + 1;
+			int[] estaciones = new Random().ints(0,15).distinct().limit(numeroDeEstacion).toArray();
+			
+			for(int estacion : estaciones){
+				posibleSolucion.put(estacion, estacion);
 			}
-			while(estacionSeleccionadaN3 == estacionSeleccionadaN1 || estacionSeleccionadaN3 == estacionSeleccionadaN2){
-				estacionSeleccionadaN3 = new Random().nextInt(15);
-			}
-			//System.out.println("Estaciones seleccionadas:" +(estacionN1+1) +"-"+(estacionN2+1)+"-"+(estacionN3+1));
-			LinkedHashMap<Integer, Integer> estacionesCubiertas = new LinkedHashMap<>();
-			//Para cada nodo cogemos sus conexiones
-			for(int num : listaEstaciones.get(estacionSeleccionadaN1)){
-				estacionesCubiertas.put(num, num);
-			}
-			for(int num : listaEstaciones.get(estacionSeleccionadaN2)){
-				estacionesCubiertas.put(num, num);
-			}
-			for(int num : listaEstaciones.get(estacionSeleccionadaN3)){
-				estacionesCubiertas.put(num, num);
-			}
-			resultadosFinales.put((estacionSeleccionadaN1+1) +"-"+(estacionSeleccionadaN2+1)+"-"+(estacionSeleccionadaN3+1), estacionesCubiertas.size());
-		}
-		Map.Entry<String, Integer> maxEntry = null;
+			
+			nodosCubiertos = new LinkedHashMap<>();
 
-		for (Map.Entry<String, Integer> entry : resultadosFinales.entrySet())
+			//Para cada nodo cogemos sus conexiones
+			for (Entry<Integer, Integer> entry : posibleSolucion.entrySet())
+			{
+				for(int num : listaEstaciones.get(entry.getValue())){
+					nodosCubiertos.put(num, num);
+				}
+			}
+			//Posible solucion contiene las estaciones.
+			resultadosFinales.put(new Solution(numeroDeEstacion, nodosCubiertos.toString(),posibleSolucion.toString()), nodosCubiertos.size());
+		}
+		Map.Entry<Solution, Integer> maxEntry = null;
+
+		for (Map.Entry<Solution, Integer> entry : resultadosFinales.entrySet())
 		{
 			//Miramos si se consigue alcanzar el máximo global.
 			if( entry.getValue() == 16){
-				System.out.println("Solución óptima alcanzada con los valores "+entry.getKey());
+				System.out.println(entry.getKey().getTamano());
+//				System.out.println("---------\nOPTIMA: Tamaño de solucion:" + entry.getKey().getTamano() + "\nNodos con estacion: "+entry.getKey().getNodosConEstacion() + "\nNodos cubiertos: "+entry.getKey().getNodosCubiertos());
+				if (maxEntry == null || entry.getKey().getTamano() < maxEntry.getKey().getTamano())
+			    {
+			        maxEntry = entry;
+			    }
+			}else{
+//				System.out.println("---------\nINVALIDA: Tamaño de solucion:" + entry.getKey().getTamano() + "\nNodos con estacion: "+entry.getKey().getNodosConEstacion() + "\nNodos cubiertos: "+entry.getKey().getNodosCubiertos());
 			}
-		    if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0)
-		    {
-		        maxEntry = entry;
-		    }
 		}
-		System.out.println(maxEntry.getKey() + "-Resultado: "+maxEntry.getValue());
+		System.out.println("Tamaño de solucion:" + maxEntry.getKey().getTamano() + "\nNodos con estacion: "+maxEntry.getKey().getNodosConEstacion() + "\nNodos cubiertos: "+maxEntry.getKey().getNodosCubiertos());
 	}
 }
