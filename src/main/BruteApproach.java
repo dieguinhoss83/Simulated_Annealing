@@ -1,10 +1,10 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 /**
  * Clase que la seleccion que permite que todos los nodos sean cubiertos por el minimo numero de estaciones de incendio.
@@ -88,34 +88,39 @@ public class BruteApproach {
 			estacionSeleccionadaN3 = new Random().nextInt(15);
 		}
 	}
+	public static ArrayList<Integer>generateSolution(int numeroEstaciones){
+		int[] estaciones = new Random().ints(0,15).distinct().limit(numeroEstaciones).toArray();
+		ArrayList<Integer> posibleSolucion = new ArrayList<>();
+
+	    for (int index = 0; index < estaciones.length; index++)
+	    {
+	    	posibleSolucion.add(estaciones[index]);
+	    }
+	    
+		return posibleSolucion; 
+	}
 	/**
 	 * Opcion bruta de alcanzar el maximo
 	 */
 	public static void bruteApproach(){
-		Map<Integer, Integer> posibleSolucion = null;
-		LinkedHashMap<Integer, Integer> nodosCubiertos = null;
-		
-		for(int i = 0 ; i < 10000000; i++){
-			nodosCubiertos = new LinkedHashMap<>();
-			posibleSolucion = new HashMap<>();
-			
+		ArrayList<Integer> posibleSolucion = null;
+		HashSet<Integer> nodosCubiertos = null;
+		for(int i = 0 ; i < 1000; i++){
+			nodosCubiertos = new HashSet<>();
+
 			//Numero de estaciones con las que cubriremos el problema
 			int numeroDeEstacion = new Random().nextInt(15) + 1;
-			int[] estaciones = new Random().ints(0,15).distinct().limit(numeroDeEstacion).toArray();
 			
-			for(int estacion : estaciones){
-				posibleSolucion.put(estacion, estacion);
-			}
+			posibleSolucion = generateSolution(numeroDeEstacion);
 			
-			nodosCubiertos = new LinkedHashMap<>();
-
 			//Para cada nodo cogemos sus conexiones
-			for (Entry<Integer, Integer> entry : posibleSolucion.entrySet())
+			for (int j = 0 ; j < posibleSolucion.size(); j++)
 			{
-				for(int num : listaEstaciones.get(entry.getValue())){
-					nodosCubiertos.put(num, num);
+				for(int num : listaEstaciones.get(posibleSolucion.get(j))){
+					nodosCubiertos.add(num);
 				}
 			}
+			Collections.sort(posibleSolucion);
 			//Posible solucion contiene las estaciones.
 			resultadosFinales.put(new Solution(numeroDeEstacion, nodosCubiertos.toString(),posibleSolucion.toString()), nodosCubiertos.size());
 		}
