@@ -7,14 +7,20 @@ import java.util.Map;
 import java.util.Random;
 
 public class BruteApproach {
+	static //Mapa que contiene los resultados para cada ejecución con el nº de estaciones conectadas
+	HashMap<String, Integer> resultadosFinales = new HashMap<>();
+			
+	static //Arraylist con todas las estaciones
+	ArrayList<int[]> listaEstaciones = new ArrayList<>();
 	
 	public static void main(String[] args) {
-		//Mapa que contiene los resultados para cada ejecución con el nº de estaciones conectadas
-		HashMap<String, Integer> resultadosFinales = new HashMap<>();
-		
-		//Arraylist con todas las estaciones
-		ArrayList<int[]> listaEstaciones = new ArrayList<>();
-		
+		addStations();
+		bruteApproach();
+	}
+	/**
+	 * Metodo que añade las conexiones entre los nodos.
+	 */
+	public static void addStations(){
 		//Declaracion de las conexiones de cada estacion
 		int[] estacion1 = {2,4,5,1};
 		listaEstaciones.add(estacion1);
@@ -63,8 +69,13 @@ public class BruteApproach {
 		
 		int[] estacion16 = {13,15,16};
 		listaEstaciones.add(estacion16);
-		
-		for(int i = 0 ; i < 1000000000; i++){
+	}
+	
+	/**
+	 * Opcion bruta de alcanzar el maximo
+	 */
+	public static void bruteApproach(){
+		for(int i = 0 ; i < 10000000; i++){
 			//Seleccionamos tres estaciones diferentes
 			int estacionSeleccionadaN1 = new Random().nextInt(15);
 			int estacionSeleccionadaN2 = new Random().nextInt(15);
@@ -75,7 +86,7 @@ public class BruteApproach {
 			while(estacionSeleccionadaN3 == estacionSeleccionadaN1 || estacionSeleccionadaN3 == estacionSeleccionadaN2){
 				estacionSeleccionadaN3 = new Random().nextInt(15);
 			}
-//			System.out.println("Estaciones seleccionadas:" +(estacionN1+1) +"-"+(estacionN2+1)+"-"+(estacionN3+1));
+			//System.out.println("Estaciones seleccionadas:" +(estacionN1+1) +"-"+(estacionN2+1)+"-"+(estacionN3+1));
 			LinkedHashMap<Integer, Integer> estacionesCubiertas = new LinkedHashMap<>();
 			//Para cada nodo cogemos sus conexiones
 			for(int num : listaEstaciones.get(estacionSeleccionadaN1)){
