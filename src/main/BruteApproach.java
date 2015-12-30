@@ -76,19 +76,12 @@ public class BruteApproach {
 		listaEstaciones.add(estacion16);
 	}
 	
-	public static void simulatedAnnealing(){
-		//Seleccionamos tres estaciones diferentes
-		int estacionSeleccionadaN1 = new Random().nextInt(15);
-		int estacionSeleccionadaN2 = new Random().nextInt(15);
-		int estacionSeleccionadaN3 = new Random().nextInt(15);
-		while(estacionSeleccionadaN2 == estacionSeleccionadaN1){
-			estacionSeleccionadaN2 = new Random().nextInt(15);
-		}
-		while(estacionSeleccionadaN3 == estacionSeleccionadaN1 || estacionSeleccionadaN3 == estacionSeleccionadaN2){
-			estacionSeleccionadaN3 = new Random().nextInt(15);
-		}
-	}
-	public static ArrayList<Integer>generateSolution(int numeroEstaciones){
+	/**
+	 * Metodo que genera una posible solucion, la cual es una lista de estaciones.
+	 * @param numeroEstaciones
+	 * @return
+	 */
+	public static ArrayList<Integer> generateSolution(int numeroEstaciones){
 		int[] estaciones = new Random().ints(0,15).distinct().limit(numeroEstaciones).toArray();
 		ArrayList<Integer> posibleSolucion = new ArrayList<>();
 
@@ -99,13 +92,14 @@ public class BruteApproach {
 	    
 		return posibleSolucion; 
 	}
+	
 	/**
 	 * Opcion bruta de alcanzar el maximo
 	 */
 	public static void bruteApproach(){
 		ArrayList<Integer> posibleSolucion = null;
 		HashSet<Integer> nodosCubiertos = null;
-		for(int i = 0 ; i < 1000; i++){
+		for(int i = 0 ; i < 1000000; i++){
 			nodosCubiertos = new HashSet<>();
 
 			//Numero de estaciones con las que cubriremos el problema
