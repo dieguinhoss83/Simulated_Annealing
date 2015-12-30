@@ -116,7 +116,7 @@ public class BruteApproach {
 			}
 			Collections.sort(posibleSolucion);
 			//Posible solucion contiene las estaciones.
-			resultadosFinales.put(new Solution(numeroDeEstacion, nodosCubiertos.toString(),posibleSolucion.toString()), nodosCubiertos.size());
+			resultadosFinales.put(new Solution(numeroDeEstacion, nodosCubiertos.toString(),posibleSolucion), nodosCubiertos.size());
 		}
 		Map.Entry<Solution, Integer> maxEntry = null;
 
@@ -134,6 +134,6 @@ public class BruteApproach {
 //				System.out.println("---------\nINVALIDA: Tamaño de solucion:" + entry.getKey().getTamano() + "\nNodos con estacion: "+entry.getKey().getNodosConEstacion() + "\nNodos cubiertos: "+entry.getKey().getNodosCubiertos());
 			}
 		}
-		System.out.println("Tamaño de solucion:" + maxEntry.getKey().getTamano() + "\nNodos con estacion: "+maxEntry.getKey().getNodosConEstacion() + "\nNodos cubiertos: "+maxEntry.getKey().getNodosCubiertos());
+		System.out.println("Tamaño de solucion: " + maxEntry.getKey().getTamano() + "\nNodos con estacion: "+maxEntry.getKey().getNodosConEstacion() + "\nNodos cubiertos: "+maxEntry.getKey().getNodosCubiertos());
 	}
 }
