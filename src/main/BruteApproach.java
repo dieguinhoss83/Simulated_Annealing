@@ -189,7 +189,7 @@ public class BruteApproach {
 		
 		//TODO hay que calcular T tal y como lo explicó Antonio en clase,
 		//es decir, tal que la probabilidad inicial de aceptación de soluciones peores sea por ej 0.9
-        double temperatura = 4000; // para las pruebas iniciales vale este valor
+        double temperatura = 5000; // para las pruebas iniciales vale este valor
         
         // 2 - Escogemos una solución inicial x, 
         // perteneciente al conjunto de soluciones
@@ -264,8 +264,14 @@ public class BruteApproach {
             // TODO method to Update T (only every L iterations, i.e. L=50)
         	temperatura *= ALFA;	
 		}
-		
+		if(mejor_sol_object.nodosCubiertos.size() < 16){
+			System.out.println("\n NO SE HA ENCONTRADO UNA SOLUCIÓN ÓPTIMA\n");
+		}
+		else{
+			System.out.println("\n SOLUCIÓN ÓPTIMA ENCONTRADA\n");
+		}
 		System.out.println("\n Mejor Solucion Encontrada en "+contador+" iteraciones = " +mejor_sol_object.getNodosConEstacion());
-		System.out.println("\n Nodos cubiertos = " +mejor_sol_object.nodosCubiertos.toString());		
+		System.out.println("\n Nodos cubiertos = " +mejor_sol_object.nodosCubiertos.toString());
+		System.out.println("\n Número de Distritos cubiertos = " +mejor_sol_object.nodosCubiertos.size());
 	}
 }
