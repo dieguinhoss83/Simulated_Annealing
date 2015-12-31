@@ -59,10 +59,12 @@ public class BruteApproach {
 		int[] estacion10 = {4,10,11,14};
 		listaEstaciones.add(estacion10);
 		
-		int[] estacion11 = {4,8,10,11,12,14,15};
+		//int[] estacion11 = {4,8,10,11,12,14,15}; => la 15 no es adyacente
+		int[] estacion11 = {4,8,10,11,12,14};
 		listaEstaciones.add(estacion11);
 		
-		int[] estacion12 = {8,9,11,12,13,14,15,16};
+		//int[] estacion12 = {8,9,11,12,13,14,15,16}; => la 14 y 16 no son adyacentes
+		int[] estacion12 = {8,9,11,12,13,15};
 		listaEstaciones.add(estacion12);
 		
 		int[] estacion13 = {7,9,12,13,15,16};
@@ -71,21 +73,24 @@ public class BruteApproach {
 		int[] estacion14 = {10,11,14,15};
 		listaEstaciones.add(estacion14);
 
-		int[] estacion15 = {11,12,13,14,15,16};
+		//int[] estacion15 = {11,12,13,14,15,16}; => la 11 no es adyacente
+		int[] estacion15 = {12,13,14,15,16};
 		listaEstaciones.add(estacion15);
 		
 		int[] estacion16 = {13,15,16};
 		listaEstaciones.add(estacion16);
 	}
 	
-	// Calcula la probabilidad de aceptacion
-    public static double probabilidadAceptacion(int numEstSolActual, int numEstNuevaActual, double temperatura) {
-        // Si la nueva solución es mejor, la aceptamos
-        if (numEstNuevaActual < numEstSolActual) {
-            return 1.0;
-        }
-        // Si la nueva solucion es peor, calculamos la probabilidad de aceptacion
-        return Math.exp(-(numEstNuevaActual - numEstSolActual) / temperatura);
+	/**
+	 * Calcula la probabilidad de aceptacion
+	 * 
+	 * @param f_xi => numero de estaciones de la solucion xi
+	 * @param f_y => numero de estaciones de la solucion y
+	 * @param temperatura
+	 * @return
+	 */
+	public static double calcular_probabilidad_aceptacion(int f_xi, int f_y, double temperatura) {
+        return Math.exp(-(f_y - f_xi) / temperatura);
     }
 	
 	/**
@@ -129,8 +134,19 @@ public class BruteApproach {
 	 * Opcion bruta de alcanzar el maximo
 	 */
 	public static void bruteApproach(){
-		ArrayList<Integer> posibleSolucionY = null;
+		ArrayList<Integer> posible_sol_y = null;
 		HashSet<Integer> nodosCubiertos = null;
+		
+		// Mejor solucion de las visitadas hasta el momento
+		ArrayList<Integer> mejor_sol = null;
+		
+		// Valor de la f(xi) => numero de estaciones de la solucion xi
+		int f_xi = 0;
+		// Valor de la f(y) => numero de estaciones de la solucion y
+		int f_y = 0;
+		// Valor de la f(x_mejor) => numero de estaciones de la mejor solucion solucion
+		int f_mejor_sol = 0;
+		
 		
 		//TODO hay que calcular T tal y como lo explicó Antonio en clase,
 		//es decir, tal que la probabilidad inicial de aceptación de soluciones peores sea por ej 0.9
@@ -138,17 +154,17 @@ public class BruteApproach {
         
         // 2 - Escogemos una solución inicial x, 
         // perteneciente al conjunto de soluciones
-        ArrayList<Integer> posibleSolXi = generateInitialSolution();
+        ArrayList<Integer> posible_sol_xi = generateInitialSolution();
         
         // 3 - La configuramos como la mejor solución hasta el momento
+        mejor_sol = posible_sol_xi;
+        f_mejor_sol=mejor_sol.size();
         
         // xi --> solucion actual
  		// y  --> nueva solucion
- 		// pi --> probabilidad de aceptacion
+ 		// p_i --> probabilidad de aceptacion
  		// u  --> valor de la uniforme
- 		int numEstacionesXi = 0;
- 		int numEstacionesY = 0;
- 		double pi = 1.0;
+ 		double p_i = 1.0;
  		double u = 0.0;
 				
  		int numeroDePruebas = 1000000;
@@ -157,63 +173,83 @@ public class BruteApproach {
 		for(int i = 0 ; i < numeroDePruebas; i++){
 			nodosCubiertos = new HashSet<>();
 
+			// 4 - Generamos aleatoriamente una nueva solucion
 			//Numero de estaciones con las que cubriremos el problema
+			// Lo calculamos con el valor de una uniforme(1,16)
 			int numeroDeEstacion = new Random().nextInt(15) + 1;
-			
-			
-			// Create new solution y
-			posibleSolucionY = generateSolution(numeroDeEstacion);
+						
+			// Creamos aleatoriamente una nueva solucion y
+			posible_sol_y = generateSolution(numeroDeEstacion);
 			
 			//Para cada nodo cogemos sus conexiones
-			for (int j = 0 ; j < posibleSolucionY.size(); j++)
+			for (int j = 0 ; j < posible_sol_y.size(); j++)
 			{
-				for(int num : listaEstaciones.get(posibleSolucionY.get(j))){
+				for(int num : listaEstaciones.get(posible_sol_y.get(j))){
 					nodosCubiertos.add(num);
 				}
 			}
-			Collections.sort(posibleSolucionY);
-			//Posible solucion contiene las estaciones.
-			resultadosFinales.put(new Solution(numeroDeEstacion, nodosCubiertos.toString(),posibleSolucionY), nodosCubiertos.size());
-            
-            // check if y best than x
+			Collections.sort(posible_sol_y);
+			
+			// 5 - Comprobamos si sol_y es mejor a sol_xi
 			// xi --> solucion actual
      		// y  --> nueva solucion
      		// pi --> probabilidad de aceptacion
      		// u  --> valor de la uniforme
-     		numEstacionesXi = 3;
-     		numEstacionesY = 5;
-     		pi = probabilidadAceptacion(numEstacionesXi, numEstacionesY, temperatura);
-     		
-     		u = DistributionGenerator.uniform();
-     		
-     		// si pi > u --> hacemos sol_actual = y
-			
-     		
-            // TODO Keep track of the best solution found
+			if(f_y < f_xi){
+				posible_sol_xi = posible_sol_y;
+				
+				// si f_y es mejor que cualquiera de las anteriores,
+				// actualizamos la mejor solucion encontrada
+				if(f_y < f_mejor_sol){
+					mejor_sol = posible_sol_y;
+					f_mejor_sol=mejor_sol.size();
+				}
+			}else{
+				// generamos un valor de la uniforme
+				u = DistributionGenerator.uniform();
+				
+				// calculamos la probabilidad de aceptacion de la nueva solucion
+				p_i = calcular_probabilidad_aceptacion(f_xi, f_y, temperatura);
+				
+				if(p_i > u){// si pi > u --> hacemos sol_actual = y
+					posible_sol_xi = posible_sol_y;
+				}
+				
+			}
+     		     		
+			//Posible solucion contiene las estaciones.
+			resultadosFinales.put(new Solution(numeroDeEstacion, nodosCubiertos.toString(),posible_sol_y), nodosCubiertos.size());
+            
+            
         	            
             // TODO Update T (every L iterations, i.e. L=50)
         	// T = alfa*T (alfa=0.9)		
 		}
 		int numeroEstacionesMinimo = 16;
+		ArrayList<ArrayList<Integer>> soluciones_encontradas = new ArrayList<>();
 
-		for (Map.Entry<Solution, Integer> entry : resultadosFinales.entrySet())
+		for (Map.Entry<Solution, Integer> solucion : resultadosFinales.entrySet())
 		{
 			//Miramos si se consigue alcanzar el máximo global.
-			if( entry.getValue() == 16){
+			if( solucion.getValue() == 16){
 				//Syso para revisar el numero de estaciones que tiene la solucion valida que acaba de ser insertada
 				//System.out.println(entry.getKey().getTamano());
-				if (entry.getKey().getTamano() < numeroEstacionesMinimo)
+				if (solucion.getKey().getTamano() < numeroEstacionesMinimo)
 			    {
-					numeroEstacionesMinimo = entry.getKey().getTamano();
+					numeroEstacionesMinimo = solucion.getKey().getTamano();
 			    }
 			}
 		}
+		
 		//Obtenemos todas las posibles soluciones con el minimo numero de estaciones ( variable numeroEstacionesMinimo)
-		for (Map.Entry<Solution, Integer> entry : resultadosFinales.entrySet())
+		for (Map.Entry<Solution, Integer> solucion : resultadosFinales.entrySet())
 		{
-			if(entry.getKey().getTamano() == numeroEstacionesMinimo && entry.getValue() == 16){
-				System.out.println("----------------------------\nTamaño de solucion: " + entry.getKey().getTamano() + "\nNodos con estacion: "+entry.getKey().getNodosConEstacion() + "\nNodos cubiertos: "+entry.getKey().getNodosCubiertos());
+			if(solucion.getKey().getTamano() == numeroEstacionesMinimo && solucion.getValue() == 16 
+					&& !soluciones_encontradas.contains(solucion.getKey().nodosConEstacion)){
+				soluciones_encontradas.add(solucion.getKey().nodosConEstacion);
+				System.out.println("----------------------------\nTamaño de solucion: " + solucion.getKey().getTamano() + "\nNodos con estacion: "+solucion.getKey().getNodosConEstacion() + "\nNodos cubiertos: "+solucion.getKey().getNodosCubiertos());
 			}
 		}
+		System.out.println("\n Soluciones Encontradas = " +soluciones_encontradas.size());
 	}
 }
