@@ -58,10 +58,10 @@ public class BruteApproach {
 		int[] estacion10 = {4,10,11,14};
 		listaEstaciones.add(estacion10);
 		
-		int[] estacion11 = {4,8,10,11,12,14,15};
+		int[] estacion11 = {4,8,10,11,12,14};
 		listaEstaciones.add(estacion11);
 		
-		int[] estacion12 = {8,9,11,12,13,14,15,16};
+		int[] estacion12 = {8,9,11,12,13,15};
 		listaEstaciones.add(estacion12);
 		
 		int[] estacion13 = {7,9,12,13,15,16};
@@ -70,7 +70,7 @@ public class BruteApproach {
 		int[] estacion14 = {10,11,14,15};
 		listaEstaciones.add(estacion14);
 
-		int[] estacion15 = {11,12,13,14,15,16};
+		int[] estacion15 = {12,13,14,15,16};
 		listaEstaciones.add(estacion15);
 		
 		int[] estacion16 = {13,15,16};
