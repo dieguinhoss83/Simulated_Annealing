@@ -4,24 +4,27 @@ import java.util.ArrayList;
 
 public class Solution {
 	public int numeroEstaciones;
+	public ArrayList<Integer> estaciones;
 	public String nodosCubiertos;
-	public ArrayList<Integer> nodosConEstacion;
+	public int numNodosCubiertos;
 	
-	public Solution(int tamano,String nodosCubiertos,ArrayList<Integer> nodosConEstacion){
-		this.numeroEstaciones = tamano;
+	public Solution(int numeroEstaciones, ArrayList<Integer> estaciones, int numNodosCubiertos, String nodosCubiertos){
+		this.numeroEstaciones = numeroEstaciones;
+		this.estaciones = estaciones;
+		
+		this.numNodosCubiertos = numNodosCubiertos;
 		this.nodosCubiertos = nodosCubiertos;
-		this.nodosConEstacion = nodosConEstacion;
 	}
 	public int getTamano() {
 		return numeroEstaciones;
 	}
-	public String getNodosConEstacion() {
+	public String getEstaciones() {
 		StringBuilder sbStr = new StringBuilder();
-	    for (int i = 0, il = nodosConEstacion.size(); i < il; i++) {
+	    for (int i = 0, il = estaciones.size(); i < il; i++) {
 	        if (i > 0)
 	            sbStr.append(" - ");
 	        
-	        sbStr.append(nodosConEstacion.get(i) + 1);
+	        sbStr.append(estaciones.get(i) + 1);
 	    }
 	    return sbStr.toString();
 	}

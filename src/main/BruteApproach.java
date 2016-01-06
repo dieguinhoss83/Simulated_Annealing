@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
+
 /**
  * Clase que la seleccion que permite que todos los nodos sean cubiertos por el minimo numero de estaciones de incendio.
  * @author javier
@@ -81,7 +82,7 @@ public class BruteApproach {
 	 * @param numeroEstaciones
 	 * @return
 	 */
-	public static ArrayList<Integer> generateSolution(int numeroEstaciones){
+	public static ArrayList<Integer> generateStationList(int numeroEstaciones){
 		int[] estaciones = new Random().ints(0,15).distinct().limit(numeroEstaciones).toArray();
 		ArrayList<Integer> posibleSolucion = new ArrayList<>();
 
@@ -93,31 +94,44 @@ public class BruteApproach {
 		return posibleSolucion; 
 	}
 	
+	public static Solution generateSolution(int amp, int min){
+		boolean valida = false;
+		Solution solucion = null;
+		do{
+		//Numero de estaciones con las que cubriremos el problema
+		//int numEstaciones = new Random().nextInt(15) + 1;
+		int numEstaciones = new Random().nextInt(amp) + min;
+		ArrayList<Integer> posibleSolucion = generateStationList(numEstaciones);
+		
+		HashSet<Integer> nodosCubiertos = new HashSet<>();
+		//Para cada nodo cogemos sus conexiones
+		for (int j = 0 ; j < posibleSolucion.size(); j++)
+		{
+			for(int num : listaEstaciones.get(posibleSolucion.get(j))){
+				nodosCubiertos.add(num);
+			}
+		}
+		Collections.sort(posibleSolucion);
+		
+		solucion = new Solution(numEstaciones, posibleSolucion, nodosCubiertos.size(), nodosCubiertos.toString());
+		
+		valida = (nodosCubiertos.size() == 16);
+		}while(!valida);
+
+		
+		return solucion;
+	}
+	
 	/**
 	 * Opcion bruta de alcanzar el maximo
 	 */
 	public static void bruteApproach(){
-		ArrayList<Integer> posibleSolucion = null;
+		Solution posibleSolucion = null;
 		HashSet<Integer> nodosCubiertos = null;
 		int numeroDePruebas = 1000000;
 		for(int i = 0 ; i < numeroDePruebas; i++){
-			nodosCubiertos = new HashSet<>();
-
-			//Numero de estaciones con las que cubriremos el problema
-			int numeroDeEstacion = new Random().nextInt(15) + 1;
-			
-			posibleSolucion = generateSolution(numeroDeEstacion);
-			
-			//Para cada nodo cogemos sus conexiones
-			for (int j = 0 ; j < posibleSolucion.size(); j++)
-			{
-				for(int num : listaEstaciones.get(posibleSolucion.get(j))){
-					nodosCubiertos.add(num);
-				}
-			}
-			Collections.sort(posibleSolucion);
-			//Posible solucion contiene las estaciones.
-			resultadosFinales.put(new Solution(numeroDeEstacion, nodosCubiertos.toString(),posibleSolucion), nodosCubiertos.size());
+			posibleSolucion = generateSolution(15, 1);
+			resultadosFinales.put(posibleSolucion, posibleSolucion.numNodosCubiertos);
 		}
 		int numeroEstacionesMinimo = 16;
 
@@ -137,7 +151,7 @@ public class BruteApproach {
 		for (Map.Entry<Solution, Integer> entry : resultadosFinales.entrySet())
 		{
 			if(entry.getKey().getTamano() == numeroEstacionesMinimo && entry.getValue() == 16){
-				System.out.println("----------------------------\nTamaño de solucion: " + entry.getKey().getTamano() + "\nNodos con estacion: "+entry.getKey().getNodosConEstacion() + "\nNodos cubiertos: "+entry.getKey().getNodosCubiertos());
+				System.out.println("----------------------------\nTamaño de solucion: " + entry.getKey().getTamano() + "\nNodos con estacion: "+entry.getKey().getEstaciones() + "\nNodos cubiertos: "+entry.getKey().getNodosCubiertos());
 			}
 		}
 	}
