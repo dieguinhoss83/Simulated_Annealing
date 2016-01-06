@@ -28,13 +28,13 @@ public class BruteApproach {
 	 */
 	public static void addStations(){
 		//Declaracion de las conexiones de cada estacion
-		int[] estacion1 = {2,4,5,1};
+		int[] estacion1 = {1,2,4,5};
 		listaEstaciones.add(estacion1);
 		
-		int[] estacion2 = {1,5,6,3,2};
+		int[] estacion2 = {1,2,3,5,6};
 		listaEstaciones.add(estacion2);
 		
-		int[] estacion3 = {2,6,7,3};
+		int[] estacion3 = {2,3,6,7};
 		listaEstaciones.add(estacion3);
 		
 		int[] estacion4 = {1,4,5,8,10,11};
@@ -43,7 +43,7 @@ public class BruteApproach {
 		int[] estacion5 = {1,2,4,5,6,8};
 		listaEstaciones.add(estacion5);
 		
-		int[] estacion6 = {2,5,6,8,3,9,7};
+		int[] estacion6 = {2,3,5,6,7,8,9};
 		listaEstaciones.add(estacion6);
 		
 		int[] estacion7 = {3,6,7,9,13};
@@ -52,7 +52,7 @@ public class BruteApproach {
 		int[] estacion8 = {4,5,6,8,9,11,12};
 		listaEstaciones.add(estacion8);
 		
-		int[] estacion9 = {6,8,7,9,12,13};
+		int[] estacion9 = {6,7,8,9,12,13};
 		listaEstaciones.add(estacion9);
 		
 		int[] estacion10 = {4,10,11,14};
@@ -83,7 +83,7 @@ public class BruteApproach {
 	 * @return
 	 */
 	public static ArrayList<Integer> generateStationList(int numeroEstaciones){
-		int[] estaciones = new Random().ints(0,15).distinct().limit(numeroEstaciones).toArray();
+		int[] estaciones = new Random().ints(1,16).distinct().limit(numeroEstaciones).toArray();
 		ArrayList<Integer> posibleSolucion = new ArrayList<>();
 
 	    for (int index = 0; index < estaciones.length; index++)
@@ -105,14 +105,15 @@ public class BruteApproach {
 		
 		HashSet<Integer> nodosCubiertos = new HashSet<>();
 		//Para cada nodo cogemos sus conexiones
+		
 		for (int j = 0 ; j < posibleSolucion.size(); j++)
 		{
-			for(int num : listaEstaciones.get(posibleSolucion.get(j))){
+			int numEstacion = posibleSolucion.get(j)-1;
+			for(int num : listaEstaciones.get(numEstacion)){
 				nodosCubiertos.add(num);
 			}
 		}
 		Collections.sort(posibleSolucion);
-		
 		solucion = new Solution(numEstaciones, posibleSolucion, nodosCubiertos.size(), nodosCubiertos.toString());
 		
 		valida = (nodosCubiertos.size() == 16);
