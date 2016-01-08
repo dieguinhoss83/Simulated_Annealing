@@ -168,7 +168,15 @@ public class BruteApproach {
 	 */
 	public static void bruteApproach(){
 		
-		double ALFA = 0.999; //tasa de enfriamiento
+		/* CONSTANTES DEL PROGRAMA */
+		final double ALFA = 0.9;
+		final int L = 400, maxItEstables = 500;
+		final double tInicial=9.5, tMin=1;
+		double temp=tInicial;
+		
+		int itEstables=0, nEstacionesAnterior=0;
+		
+		
 		
 		ArrayList<Integer> posible_sol_y = null;
 		Solution posible_sol_y_object = null;
@@ -179,28 +187,27 @@ public class BruteApproach {
 		ArrayList<Integer> mejor_sol = null;
 		Solution mejor_sol_object = null;
 		
-		// Valor de la f(xi) => numero de estaciones de la solucion xi
-		int f_xi = 16;
 		// Valor de la f(y) => numero de estaciones de la solucion y
 		int f_y = 0;
 		// Valor de la f(x_mejor) => numero de estaciones de la mejor solucion solucion
 		int f_mejor_sol = 0;
-		
-		
-		//TODO hay que calcular T tal y como lo explicó Antonio en clase,
-		//es decir, tal que la probabilidad inicial de aceptación de soluciones peores sea por ej 0.9
-        double temperatura = 5000; // para las pruebas iniciales vale este valor
-        
-        // 2 - Escogemos una solución inicial x, 
-        // perteneciente al conjunto de soluciones
-        ArrayList<Integer> posible_sol_xi = generateInitialSolution();
-        
-        // 3 - La configuramos como la mejor solución hasta el momento
-        mejor_sol = posible_sol_xi;
-        f_mejor_sol=mejor_sol.size();
-        
-        mejor_sol_object = new Solution(f_mejor_sol, obtener_distritos_cubiertos(mejor_sol) ,mejor_sol);
-        
+
+		boolean ivalida;
+		do{
+
+	        // 2 - Escogemos una solución inicial x, 
+	        // perteneciente al conjunto de soluciones
+	        ArrayList<Integer> posible_sol_xi = generateInitialSolution();
+	        
+	        // 3 - La configuramos como la mejor solución hasta el momento
+	        mejor_sol = posible_sol_xi;
+	        f_mejor_sol=mejor_sol.size();
+	        
+	        mejor_sol_object = new Solution(f_mejor_sol, obtener_distritos_cubiertos(mejor_sol) ,mejor_sol);
+
+	        ivalida = sol_y_es_valida(mejor_sol_object);
+		}while(!ivalida);
+
         // xi --> solucion actual
  		// y  --> nueva solucion
  		// p_i --> probabilidad de aceptacion
@@ -210,16 +217,13 @@ public class BruteApproach {
 				
  		int contador = 0;
  		
- 		//TODO cambiar for por while(!hemosConvergido)
-		while(temperatura > 1){
+		while(temp > tMin && itEstables<maxItEstables){
 			contador++;
 			nodosCubiertos = new HashSet<>();
-
-			// 4 - Generamos aleatoriamente una nueva solucion
-			//Numero de estaciones con las que cubriremos el problema
-			// Lo calculamos con el valor de una uniforme(1,16)
-			int numeroDeEstacion = new Random().nextInt(15) + 1;
-						
+			
+			// 4 - Generamos una nueva solucion utilizando un entorno de radio 2 [mejor_sol.size()-1, mejor_sol_size()+1]
+			int numeroDeEstacion = new Random().nextInt(2) + mejor_sol.size() -1;
+			
 			// Creamos aleatoriamente una nueva solucion y
 			posible_sol_y = generateSolution(numeroDeEstacion);
 			f_y = posible_sol_y.size();
@@ -230,46 +234,43 @@ public class BruteApproach {
 			
 			posible_sol_y_object = new Solution(f_y, nodosCubiertos ,posible_sol_y);
 			
-			// 5 - Comprobamos si sol_y es mejor a sol_xi
-			// xi --> solucion actual
+			// 5 - Comprobamos si sol_y es mejor que mejor_sol
      		// y  --> nueva solucion
      		// pi --> probabilidad de aceptacion
      		// u  --> valor de la uniforme
 			if(sol_y_es_valida(posible_sol_y_object)){
-				if(f_y < f_xi){
-					posible_sol_xi = posible_sol_y;
-					f_xi = posible_sol_xi.size();
-					
-					// si f_y es mejor que cualquiera de las anteriores,
-					// actualizamos la mejor solucion encontrada
-					if(f_y < f_mejor_sol){
-						mejor_sol = posible_sol_y;
-						f_mejor_sol=mejor_sol.size();
-						
-						mejor_sol_object = posible_sol_y_object;
-					}
+				if(f_y < f_mejor_sol){				
+					mejor_sol = posible_sol_y;
+					f_mejor_sol=mejor_sol.size();
+					mejor_sol_object = posible_sol_y_object;
 				}else{
 					// generamos un valor de la uniforme
 					u = DistributionGenerator.uniform();
 					
 					// calculamos la probabilidad de aceptacion de la nueva solucion
-					p_i = calcular_probabilidad_aceptacion(f_xi, f_y, temperatura);
+					p_i = calcular_probabilidad_aceptacion(f_mejor_sol, f_y, temp);
 					
 					if(p_i > u){// si pi > u --> hacemos sol_actual = y
-						posible_sol_xi = posible_sol_y;
+						mejor_sol = posible_sol_y;
+						f_mejor_sol=mejor_sol.size();
+						mejor_sol_object = posible_sol_y_object;
 					}
 				}
 			}
      		     		
-            // TODO method to Update T (only every L iterations, i.e. L=50)
-        	temperatura *= ALFA;	
+			if(contador%L==0)
+				temp *= ALFA;
+			
+    		if(nEstacionesAnterior==mejor_sol.size()){
+    			itEstables++;
+    		}else{
+    			itEstables=0;
+    			nEstacionesAnterior = mejor_sol.size();
+    		}
+			
+			System.out.println((itEstables<maxItEstables)+"\t"+contador+"\t"+mejor_sol+"\t"+mejor_sol.size()+"\t"+temp);
 		}
-		if(mejor_sol_object.nodosCubiertos.size() < 16){
-			System.out.println("\n NO SE HA ENCONTRADO UNA SOLUCIÓN ÓPTIMA\n");
-		}
-		else{
-			System.out.println("\n SOLUCIÓN ÓPTIMA ENCONTRADA\n");
-		}
+		
 		System.out.println("\n Mejor Solucion Encontrada en "+contador+" iteraciones = " +mejor_sol_object.getNodosConEstacion());
 		System.out.println("\n Nodos cubiertos = " +mejor_sol_object.nodosCubiertos.toString());
 		System.out.println("\n Número de Distritos cubiertos = " +mejor_sol_object.nodosCubiertos.size());
