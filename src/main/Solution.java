@@ -17,13 +17,14 @@ public class Solution {
 		return numeroEstaciones;
 	}
 	public String getNodosConEstacion() {
-		StringBuilder sbStr = new StringBuilder();
+		StringBuilder sbStr = new StringBuilder("[");
 	    for (int i = 0, il = nodosConEstacion.size(); i < il; i++) {
 	        if (i > 0)
 	            sbStr.append(" - ");
 	        
 	        sbStr.append(nodosConEstacion.get(i) + 1);
 	    }
+	    sbStr.append("]");
 	    return sbStr.toString();
 	}
 }

@@ -249,7 +249,7 @@ public class BruteApproach {
 					
 					// calculamos la probabilidad de aceptacion de la nueva solucion
 					p_i = calcular_probabilidad_aceptacion(f_mejor_sol, f_y, temp);
-					
+					System.out.println("\n\nprobab cambio = "+p_i);
 					if(p_i > u){// si pi > u --> hacemos sol_actual = y
 						mejor_sol = posible_sol_y;
 						f_mejor_sol=mejor_sol.size();
@@ -268,7 +268,7 @@ public class BruteApproach {
     			nEstacionesAnterior = mejor_sol.size();
     		}
 			
-			System.out.println((itEstables<maxItEstables)+"\t"+contador+"\t"+mejor_sol+"\t"+mejor_sol.size()+"\t"+temp);
+			System.out.println("nEstacionesAnterior = "+nEstacionesAnterior+"\titEstables = "+itEstables+"\t"+(itEstables<maxItEstables)+"\t"+contador+"\t"+mejor_sol_object.getNodosConEstacion()+"\t"+mejor_sol.size()+"\t"+temp);
 		}
 		
 		System.out.println("\n Mejor Solucion Encontrada en "+contador+" iteraciones = " +mejor_sol_object.getNodosConEstacion());
